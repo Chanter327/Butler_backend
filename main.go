@@ -5,7 +5,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	services "github.com/Chanter327/Butler_backend.git/services"
+	services "github.com/Chanter327/Butler_backend/services"
 )
 
 func main() {
