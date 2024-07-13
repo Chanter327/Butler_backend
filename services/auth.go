@@ -8,7 +8,7 @@ import (
 )
 
 func ShowUser() models.Users {
-    db, err := config.ConnectDB(".env")
+    db, err := config.ConnectDB()
     if err != nil {
         log.Printf("failed to connect to database: %v", err)
         return models.Users{}

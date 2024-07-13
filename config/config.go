@@ -17,8 +17,10 @@ type Config struct {
 	DBName string
 }
 
-func SetConfig(filePath string) (Config, error) {
-	err := godotenv.Load(filePath)
+var envPath string = ".env"
+
+func SetConfig() (Config, error) {
+	err := godotenv.Load(envPath)
 	if err != nil {
 		return Config{}, err
 	}
@@ -40,8 +42,8 @@ func SetConfig(filePath string) (Config, error) {
 	return conf, nil
 }
 
-func ConnectDB(filePath string) (*gorm.DB, error) {
-	conf, err := SetConfig(filePath)
+func ConnectDB() (*gorm.DB, error) {
+	conf, err := SetConfig()
 	if err != nil {
 		return nil, err
 	}
