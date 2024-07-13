@@ -21,7 +21,7 @@ func main() {
 		"message": "butler application",
 		"first-user": gin.H{
 			"id": user.UserId,
-			"name": user.UserName,
+			// "name": user.UserName,
 			// "registered_at": user.RegisteredAt,
 		},
 	  })
