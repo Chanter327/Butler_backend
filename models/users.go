@@ -1,6 +1,8 @@
 package database
 
 import (
+	"time"
+
 	"gorm.io/gorm"
 )
 
@@ -9,5 +11,5 @@ type Users struct {
 	UserId string
     UserName string
     Email string
-	RegisteredAt string
+	RegisteredAt time.Time
 }

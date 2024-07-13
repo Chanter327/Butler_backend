@@ -5,37 +5,23 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
-
-	"./models/users"
+	services "github.com/Chanter327/Butler_backend.git/services"
 )
 
 func main() {
-	user := showUser()
-	userName := user.UserName
-
+	user := services.ShowUser()
+	
 	r := gin.Default()
+	r.Use(gin.Logger())
 	r.GET("/", func(c *gin.Context) {
 	  c.JSON(http.StatusOK, gin.H{
 		"message": "butler application",
-		"first-user": userName,
+		"first-user": gin.H{
+			"id": user.UserId,
+			"name": user.UserName,
+			"registered_at": user.RegisteredAt,
+		},
 	  })
 	})
 	r.Run()
-}
-
-func showUser() users.Users {
-	dsn := "host=localhost user=coffee password=pass dbname=butler_db port=5432 sslmode=disable TimeZone=Asia/Tokyo"
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-    if err != nil {
-        panic("failed to connect database")
-    }
-
-	db.AutoMigrate(&users.Users{})
-
-	var user users.Users
-	db.First(&user, 1)
-
-	return user
 }
