@@ -1,2 +1,2 @@
 db/Dockerfile
-tmp/*.log
+tmp
