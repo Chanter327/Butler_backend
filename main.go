@@ -9,7 +9,10 @@ import (
 )
 
 func main() {
-	user := services.ShowUser()
+	user, err := services.ShowUser()
+	if err != nil {
+		panic(err)
+	}
 	
 	r := gin.Default()
 	r.Use(gin.Logger())
@@ -19,7 +22,7 @@ func main() {
 		"first-user": gin.H{
 			"id": user.UserId,
 			"name": user.UserName,
-			"registered_at": user.RegisteredAt,
+			// "registered_at": user.RegisteredAt,
 		},
 	  })
 	})

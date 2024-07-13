@@ -4,7 +4,7 @@ import (
 	"log"
 
 	main "github.com/Chanter327/Butler_backend"
-	"github.com/Chanter327/Butler_backend/models"
+	models "github.com/Chanter327/Butler_backend/models"
 )
 
 func ShowUser() models.Users {
