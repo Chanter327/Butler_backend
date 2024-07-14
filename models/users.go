@@ -11,5 +11,6 @@ type Users struct {
 	UserId string
     UserName string
     Email string
+	Password string
 	RegisteredAt time.Time
 }

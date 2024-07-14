@@ -1,33 +1,14 @@
 package main
 
 import (
-	"net/http"
+	"log"
 
-	"github.com/gin-gonic/gin"
-
-	services "github.com/Chanter327/Butler_backend/services"
+	routes "github.com/Chanter327/Butler_backend/routes"
 )
 
 func main() {
-	user := services.ShowUser()
-	
-	r := gin.Default()
-	r.Use(gin.Logger())
-	r.GET("/", func(c *gin.Context) {
-	  c.JSON(http.StatusOK, gin.H{
-		"message": "butler application",
-	  })
-	})
-
-	r.GET("/user", func(c *gin.Context) {
-		c.JSON(http.StatusOK, gin.H{
-			"first-user": gin.H{
-				"id": user.UserId,
-				"name": user.UserName,
-				"registered_at": user.RegisteredAt,
-			},
-		})
-	})
-
-	r.Run()
+	r := routes.Router()
+	if err := r.Run(":8080"); err != nil {
+		log.Fatalf("Failed to run server: %v", err)
+	}
 }
