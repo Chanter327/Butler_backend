@@ -8,6 +8,7 @@ import (
 
 	config "github.com/Chanter327/Butler_backend/config"
 	models "github.com/Chanter327/Butler_backend/models"
+	structs "github.com/Chanter327/Butler_backend/structs"
 )
 
 var db *gorm.DB
@@ -24,26 +25,19 @@ func init() {
 	}
 }
 
-type LoginRes struct {
-	Status   string `json:"status"`
-	Message  string `json:"message"`
-	UserName string `json:"userName,omitempty"`
-	Code int
-}
-
-func Authentication(email, password string) LoginRes {
+func Authentication(email, password string) structs.LoginRes {
 	var user models.Users
 
 	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
 		if err == gorm.ErrRecordNotFound {
-			res := LoginRes{
+			res := structs.LoginRes{
 				Status: "fail",
 				Message: "user not found",
-				Code: http.StatusUnauthorized,
+				Code: http.StatusNotFound,
 			}
 			return res
 		}
-		res := LoginRes{
+		res := structs.LoginRes{
 			Status: "fail",
 			Message: "database error: " + err.Error(),
 		}
@@ -51,7 +45,7 @@ func Authentication(email, password string) LoginRes {
 	}
 
 	if !CheckPasswordHash(password, user.Password) {
-		res := LoginRes{
+		res := structs.LoginRes{
 			Status: "fail",
 			Message: "wrong password",
 			Code: http.StatusUnauthorized,
@@ -59,7 +53,7 @@ func Authentication(email, password string) LoginRes {
 		return res
 	}
 
-	res := LoginRes{
+	res := structs.LoginRes{
 		Status: "success",
 		Message: "loged in successfully",
 		UserName: user.UserName,
@@ -68,21 +62,14 @@ func Authentication(email, password string) LoginRes {
 	return res
 }
 
-type RegistrationRes struct {
-	Status   string `json:"status"`
-	Message  string `json:"message"`
-	UserName string `json:"userName,omitempty"`
-	Code int
-}
-
-func RegisterUser(user models.Users) RegistrationRes {
+func RegisterUser(user models.Users) structs.RegistrationRes {
     var newUser models.Users = user
     var existingUser models.Users
 
     // ユーザーがすでに登録されている確認
     if err := db.Where("email = ?", user.Email).First(&existingUser).Error; err != nil {
         if err != gorm.ErrRecordNotFound {
-            res := RegistrationRes{
+            res := structs.RegistrationRes{
                 Status: "fail",
                 Message: fmt.Sprintf("database error: %v", err),
 				Code: http.StatusInternalServerError,
@@ -90,7 +77,7 @@ func RegisterUser(user models.Users) RegistrationRes {
             return res
         }
     } else {
-        res := RegistrationRes{
+        res := structs.RegistrationRes{
             Status: "fail",
             Message: "user already registered",
 			Code: http.StatusConflict,
@@ -99,7 +86,7 @@ func RegisterUser(user models.Users) RegistrationRes {
     }
 
     if err := db.Create(&newUser).Error; err != nil {
-        res := RegistrationRes{
+        res := structs.RegistrationRes{
             Status: "fail",
             Message: "registration failed",
 			Code: http.StatusInternalServerError,
@@ -107,11 +94,60 @@ func RegisterUser(user models.Users) RegistrationRes {
         return res
     }
 
-    res := RegistrationRes{
+    res := structs.RegistrationRes{
         Status: "success",
         Message: "registered user successfully",
+		UserName: newUser.UserName,
 		Code: http.StatusOK,
     }
 
     return res
+}
+
+func DeleteUser(email, password string) structs.DeleteRes {
+	var user models.Users
+
+	if err := db.Where("email = ?", email).First(&user).Error; err != nil {
+		if err == gorm.ErrRecordNotFound {
+			res := structs.DeleteRes{
+				Status: "fail",
+				Message: "user not found",
+				Code: http.StatusNotFound,
+			}
+			return res
+		} else {
+			res := structs.DeleteRes{
+				Status: "fail",
+				Message: "database error: " + err.Error(),
+				Code: http.StatusInternalServerError,
+			}
+			return res
+		}
+	}
+
+	if !CheckPasswordHash(password, user.Password) {
+		res := structs.DeleteRes{
+			Status: "fail",
+			Message: "wrong password",
+			Code: http.StatusUnauthorized,
+		}
+		return res
+	}
+
+	if err := db.Delete(&user).Error; err != nil {
+		res := structs.DeleteRes{
+			Status:  "fail",
+			Message: fmt.Sprintf("could not delete user: %v", err),
+			Code:    http.StatusInternalServerError,
+		}
+		return res
+	}
+
+	res := structs.DeleteRes{
+		Status: "success",
+		Message: fmt.Sprintf("%s was deleted successfully", user.UserName),
+		Code: http.StatusOK,
+	}
+
+	return res
 }

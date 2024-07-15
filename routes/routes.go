@@ -33,8 +33,11 @@ func Router() *gin.Engine {
 	r.POST("/api/login", func(c *gin.Context) {
 		controllers.Login(c)
 	})
-	r.POST("/api/registration", func(c *gin.Context) {
+	r.POST("/api/user/registration", func(c *gin.Context) {
 		controllers.NewRegistration(c)
+	})
+	r.POST("/api/user/delete", func(c *gin.Context) {
+		controllers.DeleteUser(c)
 	})
 
 	return r
