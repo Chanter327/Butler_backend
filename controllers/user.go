@@ -20,6 +20,7 @@ type LoginRes struct {
 	Status   string `json:"status"`
 	Message  string `json:"message"`
 	UserName string `json:"userName,omitempty"`
+	Code int
 }
 
 func Login(c *gin.Context) {
@@ -33,20 +34,8 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	user, err := services.Authentication(loginReq.Email, loginReq.Password)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, LoginRes{
-			Status:  "fail",
-			Message: "authentication failed: " + err.Error(),
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, LoginRes{
-		Status:   "success",
-		Message:  "logged in successfully",
-		UserName: user.UserName,
-	})
+	result := services.Authentication(loginReq.Email, loginReq.Password)
+	c.JSON(result.Code, result)
 }
 
 type RegistrationReq struct {
@@ -59,6 +48,7 @@ type RegistrationRes struct {
 	Status string `json:"status"`
 	Message  string `json:"message"`
 	UserName string `json:"userName,omitempty"`
+	Code int
 }
 
 func NewRegistration(c *gin.Context) {
@@ -91,18 +81,6 @@ func NewRegistration(c *gin.Context) {
 		RegisteredAt: registeredAt,
 	}
 
-	result, err := services.RegisterUser(newUser)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, RegistrationRes{
-			Status: result.Status,
-			Message: result.Message,
-		})
-		return
-	}
-
-	c.JSON(http.StatusOK, RegistrationRes{
-		Status:   "success",
-		Message:  "registration successfully",
-		UserName: newUser.UserName,
-	})
+	result := services.RegisterUser(newUser)
+	c.JSON(result.Code, result)
 }
